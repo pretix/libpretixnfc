@@ -32,5 +32,17 @@ fun chunkPayload(source: ByteArray): Array<ByteArray> {
 }
 
 fun ByteArray.toHexString(spaces: Boolean = false) = joinToString(if (spaces) " " else "") {
-    "%02x".format(it)
+    "%02x".format(it).uppercase()
+}
+
+fun String.decodeHex(): ByteArray {
+    check(length % 2 == 0) { "Must have an even length" }
+
+    return chunked(2)
+        .map { it.toInt(16).toByte() }
+        .toByteArray()
+}
+
+fun rotateLeft(byteArray: ByteArray, l: Int): ByteArray {
+    return byteArray.copyOfRange(l, byteArray.size) + byteArray.copyOfRange(0, l)
 }
