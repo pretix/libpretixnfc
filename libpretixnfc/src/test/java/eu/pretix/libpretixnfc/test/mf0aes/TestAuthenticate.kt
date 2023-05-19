@@ -137,4 +137,61 @@ class TestAuthenticate() {
         val truncatedMac = truncateMac(cmac)
         assertEquals("1D5DE802D6751670", truncatedMac.toHexString())
     }
+
+    @Test
+    fun testAesAuthFromActualExample() {
+        val fakeNfca = object : AbstractNfcA {
+            override fun connect() {}
+
+            override fun transceive(data: ByteArray): ByteArray? {
+                if (data[0] == 0x1A.toByte()) {
+                    return "af85707404563f8ac0cd2d9a18c7db6239".uppercase().decodeHex()
+                }
+                if (data[0] == 0xAF.toByte()) {
+                    assertEquals("af79c178d209dd780364fefda24240b757f02e08a6ad0cabf4a2b3f6557509718f".uppercase(), data.toHexString())
+                    return "006251131285824545e764e56a5f8592c4".uppercase().decodeHex()
+                }
+                return null
+            }
+
+            override fun close() {}
+        }
+
+        val key = "000102030405060708090A0B0C0D0E0F".decodeHex()
+        val secretKey = SecretKeySpec(key, 0, 16, "AES")
+        val iv = IvParameterSpec(ByteArray(16))
+        val aesEncrypt = { plaintext: ByteArray ->
+            val cipher: Cipher = Cipher.getInstance("AES/CBC/NoPadding")
+            cipher.init(Cipher.ENCRYPT_MODE, secretKey, iv)
+            cipher.doFinal(plaintext)
+        }
+        val aesDecrypt = { ciphertext: ByteArray ->
+            val cipher: Cipher = Cipher.getInstance("AES/CBC/NoPadding")
+            cipher.init(Cipher.DECRYPT_MODE, secretKey, iv)
+            cipher.doFinal(ciphertext)
+        }
+        val aesCmac = { plaintext: ByteArray ->
+            val mac = Mac.getInstance("AESCMAC", BouncyCastleProvider())
+            mac.init(secretKey)
+            mac.doFinal(plaintext)
+        }
+        val rndGenerator = { length: Int ->
+            "0293746d6cbe0d637672bd9d3bec4422".uppercase().decodeHex()
+        }
+        val ah = AuthenticationHelper(
+            AuthenticationHelper.KeyId.DATA_PROT_KEY,
+            fakeNfca,
+            rndGenerator,
+            aesEncrypt,
+            aesDecrypt,
+            aesCmac,
+        )
+        ah.authenticate()
+        val sesAuthMacKey = ah.deriveSesAuthMacKey("0293746d6cbe0d637672bd9d3bec4422".uppercase().decodeHex(), "4f8a30afa500343a9e850485fba905d7".uppercase().decodeHex())
+        assertEquals("fca816ce894300d9674a29dc8341010a".uppercase(), sesAuthMacKey.toHexString())
+
+        val cmacPayload = "00003029".uppercase().decodeHex()
+        val cmac = aesCmac(sesAuthMacKey, cmacPayload)
+        assertEquals("218f09e0c13b5ee1".uppercase(), truncateMac(cmac).toHexString())
+    }
 }

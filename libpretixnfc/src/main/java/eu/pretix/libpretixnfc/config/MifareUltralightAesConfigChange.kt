@@ -130,9 +130,6 @@ class MifareUltralightAesConfigChange(override val changes: List<PageChange>) : 
         fun build(): MifareUltralightAesConfigChange {
             val changes = mutableListOf<PageChange>()
 
-            if (securityOptions != null) {
-                changes.add(PageChange(0x29, securityOptions!!.toPage()))
-            }
             if (dataProtKey != null) {
                 val k = dataProtKey!!.reversed().toByteArray()
                 changes.add(PageChange(0x30, k.copyOfRange(0, 4)))
@@ -140,12 +137,15 @@ class MifareUltralightAesConfigChange(override val changes: List<PageChange>) : 
                 changes.add(PageChange(0x32, k.copyOfRange(8, 12)))
                 changes.add(PageChange(0x33, k.copyOfRange(12, 16)))
             }
-            if (dataProtKey != null) {
-                val k = dataProtKey!!.reversed().toByteArray()
+            if (uidRetrKey != null) {
+                val k = uidRetrKey!!.reversed().toByteArray()
                 changes.add(PageChange(0x34, k.copyOfRange(0, 4)))
                 changes.add(PageChange(0x35, k.copyOfRange(4, 8)))
                 changes.add(PageChange(0x36, k.copyOfRange(8, 12)))
                 changes.add(PageChange(0x37, k.copyOfRange(12, 16)))
+            }
+            if (securityOptions != null) {
+                changes.add(PageChange(0x29, securityOptions!!.toPage()))
             }
             if (lockKeys != null) {
                 changes.add(PageChange(0x2D, lockKeys!!.toPage()))
