@@ -84,7 +84,7 @@ class PretixMf0aes(val keySets: List<Mf0aesKeySet>, val useRandomIdForNewTags: B
 
         AuthenticationHelper(
             AuthenticationHelper.KeyId.DATA_PROT_KEY,
-            nfca,
+            authenticatedNfcA,
             diversifiedKey
         ).authenticate()
         return uid.toHexString(false)
@@ -121,7 +121,7 @@ class PretixMf0aes(val keySets: List<Mf0aesKeySet>, val useRandomIdForNewTags: B
             .setUidRetrKey(keySet.uidKey)
             .setSecurityOptions(
                 useRandomIdForNewTags,
-                false, // todo: enable if we get it to work on all devices
+                true,
                 MifareUltralightAesConfigChange.AUTH0_DEFAULT // todo: set to 0x04 after we are done testing
             )
             .setProtectionOptions(

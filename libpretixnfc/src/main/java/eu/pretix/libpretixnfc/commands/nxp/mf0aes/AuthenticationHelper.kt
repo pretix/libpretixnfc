@@ -132,9 +132,10 @@ class AuthenticationHelper(
 
     fun authenticate(): AbstractNfcA {
         val cmacEnabled = checkCmacEnabled()
+        val rawNfca = if (nfca is AuthenticatedNfcA) nfca.base else nfca
 
         // Execute three-way AUTHENTICATE function
-        val encryptedRndB = AuthenticatePart1(keyId.keyId).execute(nfca)
+        val encryptedRndB = AuthenticatePart1(keyId.keyId).execute(rawNfca)
 
         val rndB = aesDecrypt(encryptedRndB)
         val rndBPrime = rotateLeft(rndB, 1)
@@ -143,7 +144,7 @@ class AuthenticationHelper(
         val rndAPrime = rotateLeft(rndA, 1)
         val encryptedRndARndB = aesEncrypt(rndA + rndBPrime)
 
-        val encryptedRndAPrime = AuthenticatePart2(encryptedRndARndB).execute(nfca)
+        val encryptedRndAPrime = AuthenticatePart2(encryptedRndARndB).execute(rawNfca)
         val receivedRndAPrime = aesDecrypt(encryptedRndAPrime)
         if (!rndAPrime.contentEquals(receivedRndAPrime)) {
             throw NfcIOError("Authentication failed")
@@ -151,7 +152,7 @@ class AuthenticationHelper(
 
         if (cmacEnabled) {
             val sesAuthMacKey = deriveSesAuthMacKey(rndA, rndB)
-            return AuthenticatedNfcA(sesAuthMacKey, if (nfca is AuthenticatedNfcA) nfca.base else nfca)
+            return AuthenticatedNfcA(sesAuthMacKey, rawNfca)
         } else {
             return nfca
         }
