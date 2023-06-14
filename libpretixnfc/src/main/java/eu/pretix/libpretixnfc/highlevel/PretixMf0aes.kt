@@ -122,7 +122,8 @@ class PretixMf0aes(val keySets: List<Mf0aesKeySet>, val useRandomIdForNewTags: B
             .setSecurityOptions(
                 useRandomIdForNewTags,
                 true,
-                MifareUltralightAesConfigChange.AUTH0_DEFAULT // todo: set to 0x04 after we are done testing
+                // Don't write-protect chip in debug mode so it can be easily recovered and reused
+                if (debug) MifareUltralightAesConfigChange.AUTH0_DEFAULT else 0x04
             )
             .setProtectionOptions(
                 false,
