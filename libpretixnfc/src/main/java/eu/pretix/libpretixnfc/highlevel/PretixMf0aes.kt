@@ -72,7 +72,7 @@ class PretixMf0aes(val keySets: List<Mf0aesKeySet>, val useRandomIdForNewTags: B
             nfca,
             keySet.uidKey
         ).authenticate()
-        val uid = UidHelper(nfca).readUid()  // todo: replace with authenticatedNfca if we use secure messaging
+        val uid = UidHelper(authenticatedNfcA).readUid()
 
         val diversifiedKey = An10922KeyDiversification().generateDiversifiedKeyAES128(
             keySet.diversificationKey,

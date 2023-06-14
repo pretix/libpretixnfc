@@ -1,5 +1,6 @@
 package eu.pretix.libpretixnfc.commands.nxp.mf0aes
 
+import eu.pretix.libpretixnfc.commands.nxp.ReadPages
 import eu.pretix.libpretixnfc.communication.AbstractNfcA
 import eu.pretix.libpretixnfc.communication.NfcIOError
 import eu.pretix.libpretixnfc.rotateLeft
@@ -10,6 +11,7 @@ import javax.crypto.Cipher
 import javax.crypto.Mac
 import javax.crypto.spec.IvParameterSpec
 import javax.crypto.spec.SecretKeySpec
+import kotlin.experimental.and
 import kotlin.experimental.xor
 
 
@@ -126,7 +128,14 @@ class AuthenticationHelper(
         }
     }
 
-    fun authenticate(): AuthenticatedNfcA {
+    fun checkCmacEnabled(): Boolean {
+        val configPages = ReadPages(0x29).execute(nfca)
+        return configPages.get(0).and(0b10.toByte()) > 0
+    }
+
+    fun authenticate(): AbstractNfcA {
+        val cmacEnabled = checkCmacEnabled()
+
         // Execute three-way AUTHENTICATE function
         val encryptedRndB = AuthenticatePart1(keyId.keyId).execute(nfca)
 
@@ -142,11 +151,13 @@ class AuthenticationHelper(
         if (!rndAPrime.contentEquals(receivedRndAPrime)) {
             throw NfcIOError("Authentication failed")
         }
-        System.out.println("NFC KEY rndA = ${rndA} / ${rndA.toHexString(true)}")
-        System.out.println("NFC KEY rndB = ${rndB} / ${rndB.toHexString(true)}")
 
-        val sesAuthMacKey = deriveSesAuthMacKey(rndA, rndB)
-        return AuthenticatedNfcA(sesAuthMacKey, nfca)
+        if (cmacEnabled) {
+            val sesAuthMacKey = deriveSesAuthMacKey(rndA, rndB)
+            return AuthenticatedNfcA(sesAuthMacKey, if (nfca is AuthenticatedNfcA) nfca.base else nfca)
+        } else {
+            return nfca
+        }
     }
 
     fun deriveSesAuthMacKey(rndA: ByteArray, rndB: ByteArray): ByteArray {
