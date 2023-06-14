@@ -91,9 +91,7 @@ class AuthenticationHelper(
 
         override fun transceive(data: ByteArray): ByteArray {
             // In cryptographic calculations, the CmdCtr is represented with LSB first
-            System.out.println("cmdCtr = ${cmdCtr}")
             val cmdCtrBytes = byteArrayOf((cmdCtr and 0xFF).toByte(), ((cmdCtr and 0xFF00) shr 8).toByte())
-            System.out.println("cMac(${(cmdCtrBytes + data).toHexString(true)}) = ${aesCmac(sesAuthMacKey, cmdCtrBytes + data).toHexString(true)}")
             val sendCmac = truncateMac(aesCmac(sesAuthMacKey, cmdCtrBytes + data))
             check(sendCmac.size == 8)
             val recvData = base.transceive(data + sendCmac)
@@ -103,7 +101,6 @@ class AuthenticationHelper(
 
             cmdCtr++ // The command counter is incremented between each command and response
 
-            System.out.println("cmdCtr = ${cmdCtr}")
             val newCmdCtrBytes = byteArrayOf((cmdCtr and 0xFF).toByte(), ((cmdCtr and 0xFF00) shr 8).toByte())
             val recvCmac = recvData.copyOfRange(recvData.size - 8, recvData.size)
             val recvPayload = recvData.copyOfRange(0, recvData.size - 8)
@@ -194,11 +191,9 @@ class AuthenticationHelper(
             rndA[14],
             rndA[15],
         )
-        System.out.println("NFC KEY sv2 = ${sv2.toHexString(true)}")
         check(sv2.size == 32)
 
         val sesAuthMacKey = aesCmac(sv2)
-        System.out.println("NFC KEY sesAuthMacKey = ${sesAuthMacKey.toHexString(true)}")
         check(sesAuthMacKey.size == 16)
         return sesAuthMacKey
     }
