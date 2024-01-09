@@ -37,6 +37,10 @@ class TestAuthenticate() {
                     assertEquals("AFCDF22C5F7A92F0AF0155612B9B236AC7A424BC5238D41AD041B8165B7D99E524", data.toHexString())
                     return "002C743D6B1E128F8076BD197B76012CE8".decodeHex()
                 }
+                if (data[0] == 0x30.toByte() && data[1] == 0x29.toByte()) {
+                    // Read config byte with enabled CMAC
+                    return "02000000000000000000000000000000".decodeHex()
+                }
                 return null
             }
 
@@ -87,6 +91,10 @@ class TestAuthenticate() {
                 if (data[0] == 0xAF.toByte()) {
                     assertEquals("AF794693B2A31E7F10964A2BD834590AC485F84E9F8B13197AB32433346F60B821", data.toHexString())
                     return "00A17673DCC20D27EE80584ACCFC39E0A3".decodeHex()
+                }
+                if (data[0] == 0x30.toByte() && data[1] == 0x29.toByte()) {
+                    // Read config byte with enabled CMAC
+                    return "02000000000000000000000000000000".decodeHex()
                 }
                 return null
             }
@@ -150,6 +158,10 @@ class TestAuthenticate() {
                 if (data[0] == 0xAF.toByte()) {
                     assertEquals("af79c178d209dd780364fefda24240b757f02e08a6ad0cabf4a2b3f6557509718f".uppercase(), data.toHexString())
                     return "006251131285824545e764e56a5f8592c4".uppercase().decodeHex()
+                }
+                if (data[0] == 0x30.toByte() && data[1] == 0x29.toByte()) {
+                    // Read config byte with enabled CMAC
+                    return "02000000000000000000000000000000".decodeHex()
                 }
                 return null
             }
