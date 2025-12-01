@@ -1,0 +1,33 @@
+name: test
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test:
+    name: test
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Set up JDK
+        uses: actions/setup-java@v5
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v5
+        with:
+          build-root-directory: libpretixnfc
+
+      - name: Run Gradle
+        run: ./gradlew clean check test build jar
+        working-directory: libpretixnfc
+
+      - name: Codecov
+        uses: codecov/codecov-action@v5
