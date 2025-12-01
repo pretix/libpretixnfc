@@ -24,7 +24,8 @@ jobs:
         uses: gradle/actions/setup-gradle@v5
 
       - name: Run Gradle
-        run: ./gradlew clean check test build jar
+        run: ./gradlew clean check test build jar jacocoTestReport
+
         working-directory: libpretixnfc
 
       - name: Codecov
