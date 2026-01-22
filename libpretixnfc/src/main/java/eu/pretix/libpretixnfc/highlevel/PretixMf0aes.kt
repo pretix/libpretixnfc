@@ -29,7 +29,7 @@ class PretixMf0aes(val keySets: List<Mf0aesKeySet>, val useRandomIdForNewTags: B
     Page 0x04: public_id (big endian)
      */
 
-    fun process(nfca: AbstractNfcA, encodeWith: Mf0aesKeySet? = null): String {
+    fun process(nfca: AbstractNfcA, encodeWith: Mf0aesKeySet? = null, wipe: Boolean = false): String {
         nfca.connect()
         try {
             val tagType = GetVersion().execute(nfca) as? UltralightAESTagType
@@ -39,7 +39,7 @@ class PretixMf0aes(val keySets: List<Mf0aesKeySet>, val useRandomIdForNewTags: B
 
             val firstPage = readPages(nfca, 0x04, 1)
             if (firstPage.contentEquals(byteArrayOf(0, 0, 0, 0))) {
-                if (encodeWith != null) {
+                if (encodeWith != null && !wipe) {
                     return encode(nfca, encodeWith)
                 } else {
                     throw NfcChipReadError(ChipReadError.EMPTY_CHIP)
@@ -48,7 +48,12 @@ class PretixMf0aes(val keySets: List<Mf0aesKeySet>, val useRandomIdForNewTags: B
             for (keySet in keySets) {
                 val expectedPage = idToBytes(keySet.publicId)
                 if (firstPage.contentEquals(expectedPage)) {
-                    return decode(nfca, keySet)
+                    return if (wipe) {
+                        wipe(nfca, keySet)
+                        "OK"
+                    } else {
+                        decode(nfca, keySet)
+                    }
                 }
             }
             throw NfcChipReadError(ChipReadError.FOREIGN_CHIP)
@@ -88,6 +93,51 @@ class PretixMf0aes(val keySets: List<Mf0aesKeySet>, val useRandomIdForNewTags: B
             diversifiedKey
         ).authenticate()
         return uid.toHexString(false)
+    }
+
+
+    private fun wipe(nfca: AbstractNfcA, keySet: Mf0aesKeySet) {
+        var authenticatedNfcA = AuthenticationHelper(
+            AuthenticationHelper.KeyId.UID_RETR_KEY,
+            nfca,
+            keySet.uidKey
+        ).authenticate()
+        val uid = UidHelper(authenticatedNfcA).readUid()
+
+        val diversifiedKey = An10922KeyDiversification().generateDiversifiedKeyAES128(
+            keySet.diversificationKey,
+            uid,  // 4 bytes
+            "eu.pretix".toByteArray(Charset.defaultCharset()),  // 9 bytes
+            idToBytes(keySet.publicId)  // 4 bytes
+            // total diversification input: 17 bytes (must be 16..32)
+        )
+
+        authenticatedNfcA = AuthenticationHelper(
+            AuthenticationHelper.KeyId.DATA_PROT_KEY,
+            authenticatedNfcA,
+            diversifiedKey
+        ).authenticate()
+
+        MifareUltralightAesConfigChange.Builder()
+            .setDataProtKey(ByteArray(16) {0})
+            .setUidRetrKey(ByteArray(16) {0})
+            .setSecurityOptions(
+                randomIdActive = false,
+                secureMessagingActive = false,
+                auth0 = MifareUltralightAesConfigChange.AUTH0_DEFAULT
+            )
+            .setProtectionOptions(
+                protectReads = false,
+                lockUserConfig = false,
+                counter2IncrementWithoutAuthEnabled = false,
+                counter2ReadWithoutAuthEnabled = false,
+                vctId = 0x05,
+                authLim = 0
+            )
+            .build()
+            .write(authenticatedNfcA)
+
+        writePages(authenticatedNfcA, 0x04, ByteArray(35 * 4) { 0 })
     }
 
     private fun encode(nfca: AbstractNfcA, keySet: Mf0aesKeySet): String {
