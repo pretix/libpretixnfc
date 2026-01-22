@@ -170,18 +170,18 @@ class PretixMf0aes(val keySets: List<Mf0aesKeySet>, val useRandomIdForNewTags: B
             .setDataProtKey(diversifiedKey)
             .setUidRetrKey(keySet.uidKey)
             .setSecurityOptions(
-                useRandomIdForNewTags,
-                true,
+                randomIdActive = useRandomIdForNewTags,
+                secureMessagingActive = true,
                 // Don't write-protect chip in debug mode so it can be easily recovered and reused
-                if (debug) MifareUltralightAesConfigChange.AUTH0_DEFAULT else 0x04
+                auth0 = if (debug) MifareUltralightAesConfigChange.AUTH0_DEFAULT else 0x04
             )
             .setProtectionOptions(
-                false,
-                false,
-                false,
-                false,
-                0x05,
-                256
+                protectReads = false,
+                lockUserConfig = false,
+                counter2IncrementWithoutAuthEnabled = false,
+                counter2ReadWithoutAuthEnabled = false,
+                vctId = 0x05,
+                authLim = 256
             )
             .build()
             .write(nfca)
