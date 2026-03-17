@@ -1,0 +1,11 @@
+<resources>
+    <string name="nfc_connected_notification">NFC reader service running</string>
+    <string name="nfc_random_uid">This medium has a random ID and can\'t be used.</string>
+    <string name="nfc_read_error">The NFC chip could not be read. Try keeping it close to the device for a longer time.</string>
+    <string name="nfc_unknown_chip_type">This type of NFC chip is not supported.</string>
+    <string name="nfc_foreign_chip">This NFC chip is encoded by a different system.</string>
+    <string name="nfc_empty_chip">This NFC chip is not yet encoded.</string>
+    <string name="nfc_disabled">NFC is currently disabled on this device.</string>
+    <string name="nfc_not_supported">NFC is not supported on this device.</string>
+    <string name="progress_checking_medium">Checking medium…</string>
+</resources>
