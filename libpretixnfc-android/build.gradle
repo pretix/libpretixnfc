@@ -8,12 +8,12 @@ plugins {
 android {
     namespace 'eu.pretix.libpretinfc.android'
 
-    compileSdkVersion 33
+    compileSdk = 36
 
     defaultConfig {
-        minSdkVersion 21
-        targetSdkVersion 33
-        multiDexEnabled true
+        minSdk = 21
+        targetSdk = 36
+        multiDexEnabled = true
 
         vectorDrawables {
             useSupportLibrary = true
