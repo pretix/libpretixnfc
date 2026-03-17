@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="nfc_foreign_chip">Cette puce NFC est chiffrée avec un système différent.</string>
+    <string name="nfc_empty_chip">Cette puce NFC n\\\'est pas encore chiffrée.</string>
+    <string name="nfc_disabled">La fonction NFC est actuellement désactivée sur cet appareil.</string>
+    <string name="nfc_not_supported">La technologie NFC n\\\'est pas prise en charge par cet appareil.</string>
+    <string name="progress_checking_medium">Vérification du support…</string>
+    <string name="nfc_connected_notification">Service de lecture NFC en cours d\\\'exécution</string>
+    <string name="nfc_random_uid">Ce support a un identifiant aléatoire et ne peut pas être utilisé.</string>
+    <string name="nfc_read_error">La puce NFC n\\\'a pas pu être lue. Essayez de le maintenir plus longtemps à proximité de l\\\'appareil.</string>
+    <string name="nfc_unknown_chip_type">Ce type de puce NFC n\\\'est pas pris en charge.</string>
+</resources>

@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="nfc_not_supported">このデバイスでは NFC はサポートされていません。</string>
+    <string name="progress_checking_medium">メディアを確認中…</string>
+</resources>

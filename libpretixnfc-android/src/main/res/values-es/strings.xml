@@ -1,0 +1,11 @@
+<resources>
+    <string name="nfc_foreign_chip">Este chip NFC está cifrado por un mecanismo aparte.</string>
+    <string name="nfc_empty_chip">Este chip NFC todavía no está cifrado.</string>
+    <string name="nfc_disabled">NFC está deshabilitado en este momento en este dispositivo.</string>
+    <string name="nfc_not_supported">Este dispositivo no admite NFC.</string>
+    <string name="progress_checking_medium">Comprobando el medio…</string>
+    <string name="nfc_random_uid">El soporte tiene un identificador aleatorio y no se puede utilizar.</string>
+    <string name="nfc_read_error">No se ha podido leer el chip NFC. Intente mantenerlo cerca del dispositivo durante más tiempo.</string>
+    <string name="nfc_unknown_chip_type">Este tipo de chip NFC no es compatible.</string>
+    <string name="nfc_connected_notification">Servicio de lector NFC en ejecución</string>
+</resources>
