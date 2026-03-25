@@ -6,7 +6,7 @@ plugins {
 }
 
 android {
-    namespace 'eu.pretix.libpretinfc.android'
+    namespace 'eu.pretix.libpretixnfc.android'
 
     compileSdk = 36
 
