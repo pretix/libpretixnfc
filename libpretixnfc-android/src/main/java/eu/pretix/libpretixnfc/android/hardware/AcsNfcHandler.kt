@@ -10,7 +10,7 @@ import android.os.IBinder
 import android.util.Log
 import com.acs.smartcard.Reader
 import com.acs.smartcard.ReaderException
-import eu.pretix.libpretinfc.android.BuildConfig
+import eu.pretix.libpretixnfc.android.BuildConfig
 import eu.pretix.libpretixnfc.communication.AbstractNfcA
 import eu.pretix.libpretixnfc.communication.ChipReadError
 import eu.pretix.libpretixnfc.communication.NfcChipReadError

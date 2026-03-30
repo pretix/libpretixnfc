@@ -11,7 +11,7 @@ import android.nfc.tech.NfcA
 import android.os.Bundle
 import android.os.Vibrator
 import android.util.Log
-import eu.pretix.libpretinfc.android.BuildConfig
+import eu.pretix.libpretixnfc.android.BuildConfig
 import eu.pretix.libpretixnfc.communication.AbstractNfcA
 import eu.pretix.libpretixnfc.communication.ChipReadError
 import eu.pretix.libpretixnfc.communication.NfcChipReadError

@@ -3,7 +3,7 @@ package eu.pretix.libpretixnfc.android.hardware
 import Mf0aesKeySet
 import PretixMf0aes
 import android.app.Activity
-import eu.pretix.libpretinfc.android.BuildConfig
+import eu.pretix.libpretixnfc.android.BuildConfig
 import eu.pretix.libpretixnfc.communication.AbstractNfcA
 
 import eu.pretix.libpretixnfc.communication.ChipReadError

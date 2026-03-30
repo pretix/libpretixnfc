@@ -17,7 +17,7 @@ import androidx.core.app.PendingIntentCompat
 import androidx.core.content.ContextCompat
 import androidx.core.content.IntentCompat
 import com.acs.smartcard.Reader
-import eu.pretix.libpretinfc.android.R
+import eu.pretix.libpretixnfc.android.R
 import eu.pretix.libpretixnfc.android.hardware.AcsNfcHandler
 import eu.pretix.libpretixui.android.utils.doAsyncSentry
 
