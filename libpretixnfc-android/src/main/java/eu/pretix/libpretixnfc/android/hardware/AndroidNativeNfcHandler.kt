@@ -18,7 +18,7 @@ import eu.pretix.libpretixnfc.communication.NfcChipReadError
 import eu.pretix.libpretixnfc.communication.NfcIOError
 import eu.pretix.libpretixnfc.toHexString
 import eu.pretix.libpretixsync.db.ReusableMediaType
-import eu.pretix.libpretixui.android.utils.doAsyncSentry
+import eu.pretix.libpretixnfc.android.doAsyncSentry
 import io.sentry.Sentry
 import java.io.IOException
 

@@ -19,7 +19,7 @@ import androidx.core.content.IntentCompat
 import com.acs.smartcard.Reader
 import eu.pretix.libpretixnfc.android.R
 import eu.pretix.libpretixnfc.android.hardware.AcsNfcHandler
-import eu.pretix.libpretixui.android.utils.doAsyncSentry
+import eu.pretix.libpretixnfc.android.doAsyncSentry
 
 class AcsReaderService : Service() {
     /*
