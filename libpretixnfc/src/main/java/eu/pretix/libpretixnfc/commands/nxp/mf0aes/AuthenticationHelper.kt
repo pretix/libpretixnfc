@@ -4,7 +4,6 @@ import eu.pretix.libpretixnfc.commands.nxp.ReadPages
 import eu.pretix.libpretixnfc.communication.AbstractNfcA
 import eu.pretix.libpretixnfc.communication.NfcIOError
 import eu.pretix.libpretixnfc.rotateLeft
-import eu.pretix.libpretixnfc.toHexString
 import org.bouncycastle.jce.provider.BouncyCastleProvider
 import java.security.SecureRandom
 import javax.crypto.Cipher

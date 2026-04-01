@@ -43,8 +43,8 @@ interface NfcHandler {
 
 fun getNfcHandler(activity: Activity, keySets: List<Mf0aesKeySet>, useRandomIdForNewTags: Boolean, mode: NfcHandlerMode = NfcHandlerMode.DEFAULT, nfcReaderType: String): NfcHandler {
     return when (nfcReaderType) {
-        "acs" -> return AcsNfcHandler(activity, keySets, useRandomIdForNewTags, mode)
-        "native" -> return AndroidNativeNfcHandler(activity, keySets, useRandomIdForNewTags, mode)
+        "acs" -> AcsNfcHandler(activity, keySets, useRandomIdForNewTags, mode)
+        "native" -> AndroidNativeNfcHandler(activity, keySets, useRandomIdForNewTags, mode)
         else -> throw RuntimeException("Unknown NFC reader type ${nfcReaderType}")
     }
 }
