@@ -49,7 +49,7 @@ dependencies {
     implementation(files('libs/acssmc-1.1.5.jar'))
 
     implementation(project(':libpretixnfc')) {
-        transitive = false
+        transitive = true
     }
     implementation(project(':libpretixsync')) {
         transitive = false
