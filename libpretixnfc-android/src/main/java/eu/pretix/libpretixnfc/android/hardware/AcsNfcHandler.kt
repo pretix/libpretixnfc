@@ -17,8 +17,13 @@ import eu.pretix.libpretixnfc.communication.NfcChipReadError
 import eu.pretix.libpretixnfc.communication.NfcIOError
 import eu.pretix.libpretixsync.db.ReusableMediaType
 import eu.pretix.libpretixnfc.android.hardware.acs.AcsReaderService
-import eu.pretix.libpretixnfc.android.doAsyncSentry
+import eu.pretix.libpretixnfc.android.launchWithSentry
 import io.sentry.Sentry
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.withContext
 import java.io.IOException
 
 
@@ -35,6 +40,7 @@ class AcsNfcHandler(
     private var running = false
     private var readerService: AcsReaderService? = null
     private var chipReadListener: NfcHandler.OnChipReadListener? = null
+    private val scope = CoroutineScope(Dispatchers.IO + SupervisorJob())
 
     val supportedTypes = listOf(ReusableMediaType.NFC_UID, ReusableMediaType.NFC_MF0AES)
 
@@ -80,6 +86,7 @@ class AcsNfcHandler(
     override fun stop() {
         running = false
         readerService?.cardHandler = null
+        scope.cancel()
         Log.i(TAG, "stop @$ctx")
     }
 
@@ -145,43 +152,43 @@ class AcsNfcHandler(
                 }
                 beep(reader)
             } else if (mediaTypes?.contains(ReusableMediaType.NFC_MF0AES) == true) {
-                doAsyncSentry {
+                scope.launchWithSentry {
                     val identifier = try {
                         val nfca = AcsNfcA(reader, slotNum)
                         processMf0aes(keySets, mode, useRandomIdForNewTags, nfca)
                     } catch (e: NfcChipReadError) {
-                        ctx.runOnUiThread {
+                        withContext(Dispatchers.Main) {
                             chipReadListener?.chipReadError(e.errorType, hexId)
                         }
                         beep(reader)
-                        return@doAsyncSentry
+                        return@launchWithSentry
                     } catch (e: NfcIOError) {
                         e.printStackTrace()
-                        ctx.runOnUiThread {
+                        withContext(Dispatchers.Main) {
                             chipReadListener?.chipReadError(ChipReadError.IO_ERROR, hexId)
                         }
                         beep(reader)
-                        return@doAsyncSentry
+                        return@launchWithSentry
                     } catch (e: IOException) {
                         e.printStackTrace()
-                        ctx.runOnUiThread {
+                        withContext(Dispatchers.Main) {
                             chipReadListener?.chipReadError(ChipReadError.IO_ERROR, hexId)
                         }
                         beep(reader)
-                        return@doAsyncSentry
+                        return@launchWithSentry
                     } catch (e: Exception) {
                         e.printStackTrace()
                         Sentry.captureException(e)
-                        ctx.runOnUiThread {
+                        withContext(Dispatchers.Main) {
                             chipReadListener?.chipReadError(
                                 ChipReadError.UNKNOWN_ERROR,
                                 hexId
                             )
                         }
                         beep(reader)
-                        return@doAsyncSentry
+                        return@launchWithSentry
                     }
-                    ctx.runOnUiThread {
+                    withContext(Dispatchers.Main) {
                         if (mode == NfcHandlerMode.DEFAULT) {
                             lastTagId = hexId
                             lastTagTime = System.currentTimeMillis()

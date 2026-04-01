@@ -12,14 +12,19 @@ import android.os.Bundle
 import android.os.Vibrator
 import android.util.Log
 import eu.pretix.libpretixnfc.android.BuildConfig
+import eu.pretix.libpretixnfc.android.launchWithSentry
 import eu.pretix.libpretixnfc.communication.AbstractNfcA
 import eu.pretix.libpretixnfc.communication.ChipReadError
 import eu.pretix.libpretixnfc.communication.NfcChipReadError
 import eu.pretix.libpretixnfc.communication.NfcIOError
 import eu.pretix.libpretixnfc.toHexString
 import eu.pretix.libpretixsync.db.ReusableMediaType
-import eu.pretix.libpretixnfc.android.doAsyncSentry
 import io.sentry.Sentry
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.withContext
 import java.io.IOException
 
 
@@ -45,6 +50,7 @@ class AndroidNativeNfcHandler(
     private val buzzer =
         ctx.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator?
     private var running = false
+    private val scope = CoroutineScope(Dispatchers.IO + SupervisorJob())
 
     val supportedTypes = listOf(ReusableMediaType.NFC_UID, ReusableMediaType.NFC_MF0AES)
 
@@ -84,6 +90,7 @@ class AndroidNativeNfcHandler(
     override fun stop() {
         nfcAdapter?.disableReaderMode(ctx)
         running = false
+        scope.cancel()
         Log.i(TAG, "stop @$ctx")
     }
 
@@ -112,40 +119,40 @@ class AndroidNativeNfcHandler(
                 chipReadListener?.chipReadSuccessfully(tag.hexId(), ReusableMediaType.NFC_UID)
             }
         } else if (mediaTypes?.contains(ReusableMediaType.NFC_MF0AES) == true) {
-            doAsyncSentry {
+            scope.launchWithSentry {
                 val identifier = try {
                     val nfca = AndroidNfcA(tag)
                     processMf0aes(keySets, mode, useRandomIdForNewTags, nfca)
                 } catch (e: NfcChipReadError) {
-                    ctx.runOnUiThread {
+                    withContext(Dispatchers.Main) {
                         buzzer?.vibrate(125)
                         chipReadListener?.chipReadError(e.errorType, tag.hexId())
                     }
-                    return@doAsyncSentry
+                    return@launchWithSentry
                 } catch (e: NfcIOError) {
                     e.printStackTrace()
-                    ctx.runOnUiThread {
+                    withContext(Dispatchers.Main) {
                         buzzer?.vibrate(125)
                         chipReadListener?.chipReadError(ChipReadError.IO_ERROR, tag.hexId())
                     }
-                    return@doAsyncSentry
+                    return@launchWithSentry
                 } catch (e: IOException) {
                     e.printStackTrace()
-                    ctx.runOnUiThread {
+                    withContext(Dispatchers.Main) {
                         buzzer?.vibrate(125)
                         chipReadListener?.chipReadError(ChipReadError.IO_ERROR, tag.hexId())
                     }
-                    return@doAsyncSentry
+                    return@launchWithSentry
                 } catch (e: Exception) {
                     e.printStackTrace()
                     Sentry.captureException(e)
-                    ctx.runOnUiThread {
+                    withContext(Dispatchers.Main) {
                         buzzer?.vibrate(125)
                         chipReadListener?.chipReadError(ChipReadError.UNKNOWN_ERROR, tag.hexId())
                     }
-                    return@doAsyncSentry
+                    return@launchWithSentry
                 }
-                ctx.runOnUiThread {
+                withContext(Dispatchers.Main) {
                     buzzer?.vibrate(125)
                     chipReadListener?.chipReadSuccessfully(identifier, ReusableMediaType.NFC_MF0AES)
                 }

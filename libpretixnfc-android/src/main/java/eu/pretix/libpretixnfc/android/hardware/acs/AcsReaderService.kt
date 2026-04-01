@@ -19,7 +19,11 @@ import androidx.core.content.IntentCompat
 import com.acs.smartcard.Reader
 import eu.pretix.libpretixnfc.android.R
 import eu.pretix.libpretixnfc.android.hardware.AcsNfcHandler
-import eu.pretix.libpretixnfc.android.doAsyncSentry
+import eu.pretix.libpretixnfc.android.launchWithSentry
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.cancel
 
 class AcsReaderService : Service() {
     /*
@@ -35,6 +39,7 @@ class AcsReaderService : Service() {
     public var cardHandler: ((Reader, Int) -> Unit)? = null
     private var reader: Reader? = null
     val VENDOR_ID = 0x072f
+    private val scope = CoroutineScope(Dispatchers.IO + SupervisorJob())
 
     /**
      * Class used for the client Binder.  Because we know this service always
@@ -73,12 +78,12 @@ class AcsReaderService : Service() {
                 )
                 if (firstStateChange) {
                     firstStateChange = false
-                    doAsyncSentry {
+                    scope.launchWithSentry {
                         readerConfig()
                     }
                 }
                 if (slotNum == 0 && prevState == Reader.CARD_ABSENT && currState == Reader.CARD_PRESENT) {
-                    doAsyncSentry {
+                    scope.launchWithSentry {
                         cardHandler?.invoke(reader!!, slotNum)
                     }
                 }
@@ -230,6 +235,7 @@ class AcsReaderService : Service() {
     override fun onDestroy() {
         reader?.close()
         reader = null
+        scope.cancel()
         super.onDestroy()
     }
 }

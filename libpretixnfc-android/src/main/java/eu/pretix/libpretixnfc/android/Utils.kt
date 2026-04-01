@@ -1,13 +1,16 @@
 package eu.pretix.libpretixnfc.android
 
 import io.sentry.Sentry
-import java.lang.ref.WeakReference
-import java.util.concurrent.ExecutorService
-import java.util.concurrent.Executors
-import java.util.concurrent.Future
 import kotlin.system.exitProcess
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.CoroutineExceptionHandler
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
+import kotlin.coroutines.CoroutineContext
 
-val crashLogger: (Throwable) -> Unit = { throwable: Throwable ->
+val crashLogger: (CoroutineContext, Throwable) -> Unit = { _, throwable: Throwable ->
     throwable.printStackTrace()
     if (BuildConfig.DEBUG) {
         exitProcess(1)
@@ -16,30 +19,12 @@ val crashLogger: (Throwable) -> Unit = { throwable: Throwable ->
     }
 }
 
-class AsyncContext<T>(val weakRef: WeakReference<T>)
-
-fun <T> T.doAsyncSentry(
-        exceptionHandler: ((Throwable) -> Unit)? = crashLogger,
-        task: AsyncContext<T>.() -> Unit
-): Future<Unit> {
-    val context = AsyncContext(WeakReference(this))
-    return BackgroundExecutor.submit {
-        return@submit try {
-            context.task()
-        } catch (thr: Throwable) {
-            val result = exceptionHandler?.invoke(thr)
-            if (result != null) {
-                result
-            } else {
-                Unit
-            }
-        }
+fun CoroutineScope.launchWithSentry(
+    dispatcher: CoroutineDispatcher = Dispatchers.IO,
+    exceptionHandler: ((CoroutineContext, Throwable) -> Unit) = crashLogger,
+    task: suspend () -> Unit
+): Job {
+    return launch(dispatcher + CoroutineExceptionHandler(exceptionHandler)) {
+        task()
     }
-}
-
-internal object BackgroundExecutor {
-    var executor: ExecutorService =
-            Executors.newScheduledThreadPool(2 * Runtime.getRuntime().availableProcessors())
-
-    fun <T> submit(task: () -> T): Future<T> = executor.submit(task)
 }
