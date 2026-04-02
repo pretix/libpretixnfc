@@ -53,7 +53,11 @@ class PretixMf0aes(val keySets: List<Mf0aesKeySet>, val useRandomIdForNewTags: B
             }
             throw NfcChipReadError(ChipReadError.FOREIGN_CHIP)
         } finally {
-            nfca.close()
+            try {
+                nfca.close()
+            } catch (_: SecurityException) {
+                // ignore "tag is out of date"
+            }
         }
     }
 
