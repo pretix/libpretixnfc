@@ -38,11 +38,11 @@ private val defaultRndGenerator = { length: Int ->
     b
 }
 
+val staticAesCMac: Mac = Mac.getInstance("AESCMAC", BouncyCastleProvider())
 fun aesCmac(secret: ByteArray, plaintext: ByteArray): ByteArray {
     val secretKey = SecretKeySpec(secret, 0, 16, "AES")
-    val mac = Mac.getInstance("AESCMAC", BouncyCastleProvider())
-    mac.init(secretKey)
-    return mac.doFinal(plaintext)
+    staticAesCMac.init(secretKey)
+    return staticAesCMac.doFinal(plaintext)
 }
 
 fun truncateMac(mac: ByteArray): ByteArray {
