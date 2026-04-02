@@ -77,7 +77,7 @@ class AndroidNativeNfcHandler(
             this,
             FLAG_READER_SKIP_NDEF_CHECK or FLAG_READER_NFC_A,
             Bundle().apply {
-                putInt(NfcAdapter.EXTRA_READER_PRESENCE_CHECK_DELAY, 500)
+                putInt(NfcAdapter.EXTRA_READER_PRESENCE_CHECK_DELAY, 1200)
             }
         )
         running = true
