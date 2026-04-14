@@ -1,0 +1,59 @@
+// NOTE: update versions in settings.gradle!
+plugins {
+    id 'com.android.library'
+    id 'org.jetbrains.kotlin.android'
+    id 'org.jetbrains.kotlin.kapt'
+}
+
+android {
+    namespace 'eu.pretix.libpretixnfc.android'
+
+    compileSdk = 36
+
+    defaultConfig {
+        minSdk = 21
+        targetSdk = 36
+        multiDexEnabled = true
+
+        vectorDrawables {
+            useSupportLibrary = true
+        }
+    }
+    kotlin {
+        jvmToolchain {
+            languageVersion.set(JavaLanguageVersion.of(17))
+        }
+    }
+    java {
+        toolchain {
+            languageVersion.set(JavaLanguageVersion.of(17))
+        }
+    }
+    buildFeatures {
+        buildConfig = true
+    }
+}
+
+repositories {
+    mavenCentral()
+    maven { url 'https://jitpack.io' }
+}
+
+dependencies {
+    def kotlin_version = "1.9.23" // update in settings.gradle too
+    implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
+    implementation 'androidx.core:core-ktx:1.10.0'
+    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3"
+    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3"
+
+    implementation(files('libs/acssmc-1.1.5.jar'))
+
+    implementation(project(':libpretixnfc')) {
+        transitive = true
+    }
+    implementation(project(':libpretixsync')) {
+        transitive = false
+    }
+    implementation 'io.sentry:sentry-android:8.18.0'
+    implementation 'com.madgag.spongycastle:prov:1.58.0.0'
+}
