@@ -33,7 +33,7 @@ class AcsReaderService : Service() {
      */
 
     private val binder = LocalBinder()
-    val notificationChannel = "pretixscan:AcsReaderService"
+    val notificationChannel = "libpretixnfc_android:AcsReaderService"
     val description = "ACS reader Service"
     val notificationId = 40182724
     public var cardHandler: ((Reader, Int) -> Unit)? = null
@@ -131,7 +131,7 @@ class AcsReaderService : Service() {
     @SuppressLint("UnspecifiedImmutableFlag")
     private fun connectDevice(dev: UsbDevice) {
         val manager = getSystemService(USB_SERVICE) as UsbManager
-        val intent = Intent("eu.pretix.pretixscan.droid.hardware.nfc.USB_PERMISSION")
+        val intent = Intent("eu.pretix.libpretixnfc.android.hardware.nfc.USB_PERMISSION")
         intent.setPackage(packageName)
         val permissionIntent = PendingIntentCompat.getBroadcast(
             this,
@@ -141,7 +141,7 @@ class AcsReaderService : Service() {
             true
         )
 
-        val filter = IntentFilter("eu.pretix.pretixscan.droid.hardware.nfc.USB_PERMISSION")
+        val filter = IntentFilter("eu.pretix.libpretixnfc.android.hardware.nfc.USB_PERMISSION")
         ContextCompat.registerReceiver(
             this,
             object : BroadcastReceiver() {
