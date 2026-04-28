@@ -8,4 +8,7 @@
     <string name="nfc_not_supported">NFC is niet ondersteund op dit apparaat.</string>
     <string name="progress_checking_medium">Controleren van het medium…</string>
     <string name="nfc_unknown_chip_type">Dit type van NFC-chip is niet ondersteund.</string>
+    <string name="preference_nfc_head">NFC</string>
+    <string name="preference_nfc_type_label">Lezertype</string>
+
 </resources>

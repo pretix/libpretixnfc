@@ -8,4 +8,6 @@
     <string name="nfc_read_error">No se ha podido leer el chip NFC. Intente mantenerlo cerca del dispositivo durante más tiempo.</string>
     <string name="nfc_unknown_chip_type">Este tipo de chip NFC no es compatible.</string>
     <string name="nfc_connected_notification">Servicio de lector NFC en ejecución</string>
+    <string name="preference_nfc_head">NFC</string>
+    <string name="preference_nfc_type_label">Tipo de lector</string>
 </resources>

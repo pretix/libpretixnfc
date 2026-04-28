@@ -8,4 +8,10 @@
     <string name="nfc_disabled">NFC ist auf diesem Gerät gerade deaktiviert.</string>
     <string name="nfc_not_supported">NFC wird auf diesem Gerät nicht unterstützt.</string>
     <string name="progress_checking_medium">Prüfe Medium…</string>
+    <string name="preference_nfc_head">NFC</string>
+    <string name="preference_nfc_type_label">Leser-Typ</string>
+    <string-array name="preference_nfc_type">
+        <item>Eingebauter NFC-Leser</item>
+        <item>ACS-USB-Leser (experimentell)</item>
+    </string-array>
 </resources>
