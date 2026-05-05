@@ -50,11 +50,14 @@ fun getNfcHandler(activity: Activity, keySets: List<Mf0aesKeySet>, useRandomIdFo
 }
 
 fun processMf0aes(keySets: List<Mf0aesKeySet>, mode: NfcHandlerMode, useRandomIdForNewTags: Boolean = false, nfca: AbstractNfcA): String {
-    return PretixMf0aes(
+    val mf0aes = PretixMf0aes(
         keySets,
         useRandomIdForNewTags,
         BuildConfig.DEBUG,
-    ).process(
-        nfca,
-        encodeWith = if (mode == NfcHandlerMode.ENCODE) keySets.firstOrNull { it.canEncode } else null)
+    )
+    return when (mode) {
+        NfcHandlerMode.DEFAULT -> mf0aes.process(nfca)
+        NfcHandlerMode.ENCODE -> mf0aes.process(nfca, keySets.firstOrNull { it.canEncode })
+        NfcHandlerMode.WIPE -> mf0aes.process(nfca, wipe=true)
+    }
 }
