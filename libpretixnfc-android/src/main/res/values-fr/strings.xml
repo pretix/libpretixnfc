@@ -9,4 +9,6 @@
     <string name="nfc_random_uid">Ce support a un identifiant aléatoire et ne peut pas être utilisé.</string>
     <string name="nfc_read_error">La puce NFC n\\\'a pas pu être lue. Essayez de le maintenir plus longtemps à proximité de l\\\'appareil.</string>
     <string name="nfc_unknown_chip_type">Ce type de puce NFC n\\\'est pas pris en charge.</string>
+    <string name="preference_nfc_head">NFC</string>
+    <string name="preference_nfc_type_label">Type de lecteur</string>
 </resources>
