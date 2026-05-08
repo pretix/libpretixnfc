@@ -154,7 +154,9 @@ class AcsNfcHandler(
             } else if (mediaTypes?.contains(ReusableMediaType.NFC_MF0AES) == true) {
                 scope.launchWithSentry {
                     val identifier = try {
-                        val nfca = AcsNfcA(reader, slotNum)
+                        // Since we already connected higher up (to read the UID), we still have a
+                        // working nfca and should *not* attempt to power-cycle the card.
+                        // val nfca = AcsNfcA(reader, slotNum)
                         processMf0aes(keySets, mode, useRandomIdForNewTags, nfca)
                     } catch (e: NfcChipReadError) {
                         withContext(Dispatchers.Main) {
