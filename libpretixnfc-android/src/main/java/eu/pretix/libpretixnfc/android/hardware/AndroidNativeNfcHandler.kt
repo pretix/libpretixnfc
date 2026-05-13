@@ -34,7 +34,8 @@ private var lastTagTime: Long = 0
 
 enum class NfcHandlerMode {
     DEFAULT,
-    ENCODE
+    ENCODE,
+    WIPE
 }
 
 
