@@ -49,7 +49,7 @@ class AndroidNativeNfcHandler(
     private var mediaTypes: List<ReusableMediaType>? = null
     private val buzzer =
         ctx.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator?
-    private var running = false
+    private var state = NfcHandler.NfcState.INITIALIZED
     private val scope = CoroutineScope(Dispatchers.IO + SupervisorJob())
 
     val supportedTypes = listOf(ReusableMediaType.NFC_UID, ReusableMediaType.NFC_MF0AES)
@@ -66,9 +66,11 @@ class AndroidNativeNfcHandler(
         this.mediaTypes = mediaTypes
         Log.i(TAG, "start (${mediaTypes.joinToString(", ")}) @$ctx")
         if (nfcAdapter == null) {
+            state = NfcHandler.NfcState.UNSUPPORTED
             throw NfcUnsupported()
         }
         if (!nfcAdapter!!.isEnabled) {
+            state = NfcHandler.NfcState.DISABLED
             throw NfcDisabled()
         }
 
@@ -89,13 +91,19 @@ class AndroidNativeNfcHandler(
 
     override fun stop() {
         nfcAdapter?.disableReaderMode(ctx)
-        running = false
+        state = NfcHandler.NfcState.STOPPED
+        ctx.unregisterReceiver(nfcStateReceiver)
         scope.cancel()
         Log.i(TAG, "stop @$ctx")
     }
 
+    @Deprecated("Use State instead")
     override fun isRunning(): Boolean {
-        return running
+        return state == NfcHandler.NfcState.RUNNING
+    }
+
+    override fun getState(): NfcHandler.NfcState {
+        return state
     }
 
     override fun setOnChipReadListener(listener: NfcHandler.OnChipReadListener?) {

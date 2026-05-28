@@ -19,6 +19,11 @@ interface NfcHandler {
         fun chipReadError(error: ChipReadError, identifier: String?)
     }
 
+    enum class NfcState {
+        INITIALIZED, RUNNING, STOPPED,
+        UNSUPPORTED, DISABLED
+    }
+
     /**
      * Start listening for chips. Should e.g. be called in Activity.onResume().
      */
@@ -30,7 +35,10 @@ interface NfcHandler {
      */
     fun stop()
 
+    @Deprecated("Use State instead")
     fun isRunning(): Boolean
+
+    fun getState(): NfcState
 
     fun getMediaTypes(): List<ReusableMediaType>?
 
