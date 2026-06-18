@@ -119,7 +119,9 @@ class AndroidNativeNfcHandler(
     }
 
     override fun stop() {
-        nfcAdapter?.disableReaderMode(ctx)
+        if (!ctx.isDestroyed) {
+            nfcAdapter?.disableReaderMode(ctx)
+        }
         state = NfcHandler.NfcState.STOPPED
         ctx.unregisterReceiver(nfcStateReceiver)
         scope.cancel()
