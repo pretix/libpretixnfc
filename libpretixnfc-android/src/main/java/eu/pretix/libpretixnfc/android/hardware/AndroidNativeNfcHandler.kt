@@ -88,7 +88,9 @@ class AndroidNativeNfcHandler(
     }
 
     override fun stop() {
-        nfcAdapter?.disableReaderMode(ctx)
+        if (!ctx.isDestroyed) {
+            nfcAdapter?.disableReaderMode(ctx)
+        }
         running = false
         scope.cancel()
         Log.i(TAG, "stop @$ctx")
