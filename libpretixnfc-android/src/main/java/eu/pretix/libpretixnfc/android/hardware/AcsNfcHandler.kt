@@ -37,7 +37,7 @@ class AcsNfcHandler(
     private val mode: NfcHandlerMode = NfcHandlerMode.DEFAULT
 ) : NfcHandler, (Reader, Int) -> Unit {
     private var mediaTypes: List<ReusableMediaType>? = null
-    private var running = false
+    private var state = NfcHandler.NfcState.INITIALIZED
     private var readerService: AcsReaderService? = null
     private var chipReadListener: NfcHandler.OnChipReadListener? = null
     private val scope = CoroutineScope(Dispatchers.IO + SupervisorJob())
@@ -68,7 +68,8 @@ class AcsNfcHandler(
         this.mediaTypes = mediaTypes
         Log.i(TAG, "start (${mediaTypes.joinToString(", ")}) @$ctx")
 
-        running = true
+        // FIXME: shouldn't running be set by AcsReaderService, after connection to the reader succeeded?
+        state = NfcHandler.NfcState.RUNNING
 
         Intent(ctx, AcsReaderService::class.java).also { intent ->
             ctx.bindService(intent, readerConnection, Context.BIND_AUTO_CREATE)
@@ -84,14 +85,19 @@ class AcsNfcHandler(
     }
 
     override fun stop() {
-        running = false
+        state = NfcHandler.NfcState.STOPPED
         readerService?.cardHandler = null
         scope.cancel()
         Log.i(TAG, "stop @$ctx")
     }
 
+    @Deprecated("Use State instead")
     override fun isRunning(): Boolean {
-        return running
+        return state == NfcHandler.NfcState.RUNNING
+    }
+
+    override fun getState(): NfcHandler.NfcState {
+        return state
     }
 
     private fun readUid(reader: Reader, slotNum: Int): String {

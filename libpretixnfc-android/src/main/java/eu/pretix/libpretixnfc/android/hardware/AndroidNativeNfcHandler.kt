@@ -2,7 +2,10 @@ package eu.pretix.libpretixnfc.android.hardware
 
 import Mf0aesKeySet
 import android.app.Activity
+import android.content.BroadcastReceiver
 import android.content.Context
+import android.content.Intent
+import android.content.IntentFilter
 import android.nfc.NfcAdapter
 import android.nfc.NfcAdapter.FLAG_READER_NFC_A
 import android.nfc.NfcAdapter.FLAG_READER_SKIP_NDEF_CHECK
@@ -49,13 +52,31 @@ class AndroidNativeNfcHandler(
     private var mediaTypes: List<ReusableMediaType>? = null
     private val buzzer =
         ctx.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator?
-    private var running = false
+    private var state = NfcHandler.NfcState.INITIALIZED
     private val scope = CoroutineScope(Dispatchers.IO + SupervisorJob())
 
     val supportedTypes = listOf(ReusableMediaType.NFC_UID, ReusableMediaType.NFC_MF0AES)
 
     companion object {
         val TAG = "AndroidNativeNfcHandler"
+    }
+
+    private val nfcStateReceiver: BroadcastReceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context?, intent: Intent) {
+            if (intent.action != NfcAdapter.ACTION_ADAPTER_STATE_CHANGED) {
+                return
+            }
+            when (intent.getIntExtra(NfcAdapter.EXTRA_ADAPTER_STATE, NfcAdapter.STATE_OFF)) {
+                NfcAdapter.STATE_OFF -> {
+                    state = NfcHandler.NfcState.DISABLED
+                }
+                NfcAdapter.STATE_TURNING_OFF -> {}
+                NfcAdapter.STATE_ON -> {
+                    _start()
+                }
+                NfcAdapter.STATE_TURNING_ON -> {}
+            }
+        }
     }
 
     override fun start(mediaTypes: List<ReusableMediaType>) {
@@ -66,12 +87,22 @@ class AndroidNativeNfcHandler(
         this.mediaTypes = mediaTypes
         Log.i(TAG, "start (${mediaTypes.joinToString(", ")}) @$ctx")
         if (nfcAdapter == null) {
+            state = NfcHandler.NfcState.UNSUPPORTED
             throw NfcUnsupported()
         }
+
+        val filter = IntentFilter(NfcAdapter.ACTION_ADAPTER_STATE_CHANGED)
+        ctx.registerReceiver(nfcStateReceiver, filter)
+
         if (!nfcAdapter!!.isEnabled) {
+            state = NfcHandler.NfcState.DISABLED
             throw NfcDisabled()
         }
 
+        _start()
+    }
+
+    fun _start() {
         nfcAdapter!!.enableReaderMode(
             ctx,
             this,
@@ -80,7 +111,7 @@ class AndroidNativeNfcHandler(
                 putInt(NfcAdapter.EXTRA_READER_PRESENCE_CHECK_DELAY, 1200)
             }
         )
-        running = true
+        state = NfcHandler.NfcState.RUNNING
     }
 
     override fun getMediaTypes(): List<ReusableMediaType>? {
@@ -91,13 +122,19 @@ class AndroidNativeNfcHandler(
         if (!ctx.isDestroyed) {
             nfcAdapter?.disableReaderMode(ctx)
         }
-        running = false
+        state = NfcHandler.NfcState.STOPPED
+        ctx.unregisterReceiver(nfcStateReceiver)
         scope.cancel()
         Log.i(TAG, "stop @$ctx")
     }
 
+    @Deprecated("Use State instead")
     override fun isRunning(): Boolean {
-        return running
+        return state == NfcHandler.NfcState.RUNNING
+    }
+
+    override fun getState(): NfcHandler.NfcState {
+        return state
     }
 
     override fun setOnChipReadListener(listener: NfcHandler.OnChipReadListener?) {
