@@ -123,7 +123,11 @@ class AndroidNativeNfcHandler(
             nfcAdapter?.disableReaderMode(ctx)
         }
         state = NfcHandler.NfcState.STOPPED
-        ctx.unregisterReceiver(nfcStateReceiver)
+        try {
+            ctx.unregisterReceiver(nfcStateReceiver)
+        } catch (_: IllegalArgumentException) {
+            // receiver is already unregistered
+        }
         scope.cancel()
         Log.i(TAG, "stop @$ctx")
     }
