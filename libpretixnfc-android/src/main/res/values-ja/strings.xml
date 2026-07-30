@@ -9,4 +9,6 @@
     <string name="progress_checking_medium">メディアを確認中…</string>
     <string name="nfc_random_uid">このメディアはランダムIDを持っており使用できません。</string>
     <string name="nfc_connected_notification">NFCリーダーサービスを実行中</string>
+    <string name="preference_nfc_head">NFC</string>
+    <string name="preference_nfc_type_label">リーダーの種類</string>
 </resources>
