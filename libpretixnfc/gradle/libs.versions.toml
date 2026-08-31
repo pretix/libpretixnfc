@@ -1,0 +1,12 @@
+[versions]
+bcpkixJdk15to18 = "1.70"
+junit = "4.13.2"
+kotlin = "2.2.21"
+
+[libraries]
+bcpkix-jdk15to18 = { module = "org.bouncycastle:bcpkix-jdk15to18", version.ref = "bcpkixJdk15to18" }
+bcprov-jdk15to18 = { module = "org.bouncycastle:bcprov-jdk15to18", version.ref = "bcpkixJdk15to18" }
+junit = { module = "junit:junit", version.ref = "junit" }
+
+[plugins]
+kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }

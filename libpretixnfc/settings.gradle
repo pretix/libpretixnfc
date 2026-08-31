@@ -10,7 +10,14 @@ pluginManagement {
 
 plugins {
     id "org.gradle.toolchains.foojay-resolver-convention" version "1.0.0"
-    id "org.jetbrains.kotlin.jvm" version "2.2.21" apply false
+}
+
+dependencyResolutionManagement {
+    versionCatalogs {
+        nfcCoreLibs {
+            from(files('gradle/libs.versions.toml'))
+        }
+    }
 }
 
 rootProject.name = "eu.pretix.libpretixnfc"
