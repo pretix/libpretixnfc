@@ -1,0 +1,19 @@
+[versions]
+agp = "8.4.2"
+kotlin = "2.2.21"
+coreKtx = "1.10.0"
+kotlinxCoroutinesCore = "1.7.3"
+prov = "1.58.0.0"
+sentryAndroid = "8.18.0"
+
+[libraries]
+core-ktx = { module = "androidx.core:core-ktx", version.ref = "coreKtx" }
+kotlin-stdlib = { module = "org.jetbrains.kotlin:kotlin-stdlib", version.ref = "kotlin" }
+kotlinx-coroutines-android = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-android", version.ref = "kotlinxCoroutinesCore" }
+kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "kotlinxCoroutinesCore" }
+prov = { module = "com.madgag.spongycastle:prov", version.ref = "prov" }
+sentry-android = { module = "io.sentry:sentry-android", version.ref = "sentryAndroid" }
+
+[plugins]
+android-library = { id = "com.android.library", version.ref = "agp" }
+kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
