@@ -24,9 +24,36 @@ jobs:
         uses: gradle/actions/setup-gradle@v5
 
       - name: Run Gradle
-        run: ./gradlew clean check test build jar jacocoTestReport
+        run: ./gradlew clean jvmTest jvmJar jacocoTestReport
 
         working-directory: libpretixnfc
 
       - name: Codecov
         uses: codecov/codecov-action@v5
+
+  ios-test:
+    name: ios-test
+    runs-on: macos-latest
+
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Set up JDK
+        uses: actions/setup-java@v5
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Cache Kotlin/Native distribution
+        uses: actions/cache@v4
+        with:
+          path: ~/.konan
+          key: ${{ runner.os }}-konan-${{ hashFiles('libpretixnfc/gradle/libs.versions.toml') }}
+          restore-keys: ${{ runner.os }}-konan-
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v5
+
+      - name: Run Gradle
+        run: ./gradlew iosSimulatorArm64Test compileKotlinIosArm64 compileKotlinIosX64
+        working-directory: libpretixnfc

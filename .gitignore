@@ -33,6 +33,7 @@ local.properties
 *.iml
 .DS_Store
 build/
+.kotlin
 .ropeproject/
 
 upload.sh
